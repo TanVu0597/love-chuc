@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bot's em</title>
+<style>
+  :root{
+    --bg:#fff0f6;
+    --card:#ffffff;
+    --pink:#ff4d88;
+    --accent:#ffb3c6;
+    --text:#333;
+  }
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: radial-gradient(circle at 10% 10%, #fff6f9, var(--bg) 30%);
+    padding:20px;
+  }
+  .card{
+    width:360px;
+    max-width:95%;
+    background:linear-gradient(180deg, rgba(255,255,255,0.9), var(--card));
+    border-radius:18px;
+    box-shadow: 0 12px 30px rgba(255,77,136,0.12);
+    padding:28px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .heart{
+    width:76px;height:76px;border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, #fff, var(--pink));
+    display:inline-flex;
+    align-items:center;justify-content:center;
+    color:white;font-weight:700;font-size:34px;margin-bottom:14px;
+    transform:scale(1);
+    animation: beat 1s infinite;
+    box-shadow: 0 8px 20px rgba(255,77,136,0.18);
+  }
+  @keyframes beat{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.08)}
+    100%{transform:scale(1)}
+  }
+  h1{margin:8px 0 4px;color:var(--pink);font-size:20px}
+  p.subtitle{margin:0 0 14px;color:#8a3b56;font-size:13px}
+  .message{
+    min-height:90px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;color:var(--text);padding:8px 12px;
+    transition:opacity .4s, transform .4s;
+  }
+  .controls{display:flex;gap:10px;justify-content:center;margin-top:14px}
+  .btn{
+    padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:600;
+    background:var(--pink);color:white;box-shadow:0 6px 14px rgba(255,77,136,0.12);
+  }
+  .hidden{opacity:0;transform:translateY(8px);pointer-events:none}
+  .small{font-size:12px;color:#7a3b4f;margin-top:10px}
+  
+  /* nice confetti dots */
+  .dot{
+    position:absolute;width:8px;height:8px;border-radius:50%;
+    background:var(--accent);opacity:.9;
+    transform: translateY(120%);
+    animation: floatup 1.6s ease forwards;
+  }
+  @keyframes floatup{
+    0%{transform: translateY(60%) scale(.4);opacity:0}
+    30%{opacity:1}
+    100%{transform: translateY(-120%) scale(1);opacity:1}
+  }
+</style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="heart">❤</div>
+    <h1>Gửi Bot's Em</h1>
+    <p class="subtitle">Bấm nút để nhận bất ngờ 💌</p>
+
+    <div class="message" id="message">Nhấn nhé!</div>
+
+    <div class="controls">
+      <button class="btn" id="showBtn">Hiện lời chúc</button>
+      <button class="btn" id="surpriseBtn" style="background:#ff8fb3">Ngẫu nhiên liên tục</button>
+    </div>
+  </div>
+
+<script>
+const messages = [
+  "Em là lý do khiến anh mỉm cười mỗi buổi sáng.",
+  "Anh nhớ em hơn hôm qua, nhưng chắc chắn kém ngày mai.",
+  "Cảm ơn em đã đến bên anh — mãi mãi nhé!",
+  "Mỗi khoảnh khắc với em đều đặc biệt.",
+  "Nếu có thể chọn lại, anh vẫn chọn em.",
+  "Em chính là nhà, là an yên của anh.",
+];
+
+const msgEl = document.getElementById('message');
+const showBtn = document.getElementById('showBtn');
+const surpriseBtn = document.getElementById('surpriseBtn');
+let autoInterval = null;
+
+function pickRandom(){
+  return messages[Math.floor(Math.random()*messages.length)];
+}
+
+function showMsg(text){
+  msgEl.classList.add('hidden');
+  setTimeout(()=> {
+    msgEl.textContent = text;
+    msgEl.classList.remove('hidden');
+    spawnDots();
+  }, 260);
+}
+
+showBtn.addEventListener('click', ()=> {
+  showMsg(pickRandom());
+});
+
+surpriseBtn.addEventListener('click', ()=> {
+  if(autoInterval){
+    clearInterval(autoInterval); autoInterval = null;
+    surpriseBtn.textContent = "Ngẫu nhiên liên tục";
+    showBtn.disabled = false;
+  } else {
+    showBtn.disabled = true;
+    surpriseBtn.textContent = "Dừng";
+    showMsg(pickRandom());
+    autoInterval = setInterval(()=> showMsg(pickRandom()), 1400);
+  }
+});
+
+function spawnDots(){
+  // create 8 dots randomly for confetti-like effect
+  const card = document.getElementById('card');
+  for(let i=0;i<8;i++){
+    const d = document.createElement('div');
+    d.className='dot';
+    d.style.left = (10 + Math.random()*80) + '%';
+    d.style.background = ['#ffd1e6','#ff8fb3','#ffb3c6','#ff6f98'][Math.floor(Math.random()*4)];
+    d.style.animationDelay = (Math.random()*0.25) + 's';
+    d.style.width = (6 + Math.random()*8) + 'px';
+    d.style.height = d.style.width;
+    card.appendChild(d);
+    setTimeout(()=> d.remove(), 1800);
+  }
+}
+</script>
+</body>
+</html>
