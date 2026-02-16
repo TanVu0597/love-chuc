@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tết Bính Ngọ 2026 - Bot's em</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:'Segoe UI',system-ui,sans-serif;
+}
+
+body{
+    background:linear-gradient(-45deg,#020024,#3f0071,#000428,#000);
+    background-size:400% 400%;
+    animation:bgMove 20s ease infinite;
+}
+
+@keyframes bgMove{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+
+canvas{
+    position:fixed;
+    inset:0;
+}
+
+#countdown{
+    position:fixed;
+    top:40%;
+    width:100%;
+    text-align:center;
+    font-weight:900;
+    color:#fff;
+    text-shadow:
+      0 0 20px #00eaff,
+      0 0 60px #0077ff;
+    animation:pulse 1.4s infinite;
+}
+
+#wish{
+    position:fixed;
+    top:42%;
+    width:100%;
+    text-align:center;
+    font-weight:900;
+    color:#fff;
+    display:none;
+    text-shadow:
+      0 0 15px #fff,
+      0 0 40px gold,
+      0 0 80px red;
+    animation:zoom 2.6s infinite;
+}
+
+@keyframes pulse{
+    0%{transform:scale(1);opacity:.8}
+    50%{transform:scale(1.08);opacity:1}
+    100%{transform:scale(1);opacity:.8}
+}
+@keyframes zoom{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.1)}
+    100%{transform:scale(1)}
+}
+
+.flash{
+    position:fixed;
+    inset:0;
+    background:white;
+    animation:flash .7s forwards;
+}
+@keyframes flash{
+    0%{opacity:1}
+    100%{opacity:0}
+}
+
+@media (max-width:768px){
+    #countdown{font-size:42px}
+    #wish{font-size:40px}
+}
+@media (min-width:769px){
+    #countdown{font-size:72px}
+    #wish{font-size:64px}
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+<div id="countdown"></div>
+<div id="wish"></div>
+
+<script>
+const TEST_MODE = false;   // bật test
+const TEST_SECONDS = 8;   // số giây test
+/* ===== GIAO THỪA ÂM LỊCH 2026 ===== */
+/* 00:00 ngày 17/02/2026 (GMT+7 Việt Nam) */
+const lunarNewYear = TEST_MODE
+    ? new Date(Date.now() + TEST_SECONDS * 1000)
+    : new Date("2026-02-17T00:00:00+07:00");
+
+const countdownEl = document.getElementById("countdown");
+const wishEl = document.getElementById("wish");
+
+let wishIndex = 0;
+let isNewYear = false;
+
+
+
+/* ===== LỜI CHÚC ===== */
+const wishes = [
+  "Bước sang năm mới rồi ❤️",
+  "Điều đầu tiên anh muốn làm… là ôm em thật chặt",
+  "Cảm ơn em vì đã đến bên anh",
+  "Cảm ơn vì đã yêu anh theo cách dịu dàng nhất",
+  "Anh mong năm mới sẽ có thật nhiều kỷ niệm đẹp",
+  "Mong chúng ta sẽ cùng nhau trưởng thành",
+  "Cùng nhau đi qua những ngày vui và cả những ngày khó khăn",
+  "Chỉ cần còn nắm tay nhau, mọi chuyện đều ổn",
+  "Anh không hứa sẽ hoàn hảo",
+  "Nhưng anh hứa sẽ luôn yêu em nhiều hơn mỗi ngày 💕"
+];
+
+/* ===== CANVAS ===== */
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+function resize(){
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = innerWidth * dpr;
+    canvas.height = innerHeight * dpr;
+    canvas.style.width = innerWidth + "px";
+    canvas.style.height = innerHeight + "px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resize();
+addEventListener("resize",resize);
+
+/* ===== KIỂM TRA THỜI GIAN ===== */
+if (new Date() >= lunarNewYear) {
+    isNewYear = true;
+    setTimeout(newYear, 200);
+}
+
+/* ===== COUNTDOWN ===== */
+function tick(){
+    if (isNewYear) return;
+
+    const now = new Date();
+    const diff = lunarNewYear - now;
+
+    if(diff <= 0){
+        isNewYear = true;
+        newYear();
+        return;
+    }
+
+    const days = Math.floor(diff / (1000*60*60*24));
+    const h = Math.floor(diff % (1000*60*60*24) / 3600000);
+    const m = Math.floor(diff % 3600000 / 60000);
+    const s = Math.floor(diff % 60000 / 1000);
+
+    if (days > 0) {
+        countdownEl.textContent =
+          `${days} ngày ${String(h).padStart(2,"0")} : ${String(m).padStart(2,"0")} : ${String(s).padStart(2,"0")}`;
+    } else {
+        countdownEl.textContent =
+          `${String(h).padStart(2,"0")} : ${String(m).padStart(2,"0")} : ${String(s).padStart(2,"0")}`;
+    }
+}
+
+setInterval(tick,1000);
+tick();
+
+/* ===== PHÁO HOA ===== */
+let fireworks=[];
+
+class Particle{
+    constructor(x,y,c){
+        this.x=x;this.y=y;this.c=c;
+        this.vx=(Math.random()-.5)*10;
+        this.vy=(Math.random()-.5)*10;
+        this.a=1;
+        this.s=Math.random()*2+1;
+    }
+    update(){
+        this.x+=this.vx;
+        this.y+=this.vy;
+        this.vy+=.03;
+        this.a-=.012;
+    }
+    draw(){
+        ctx.globalAlpha=this.a;
+        ctx.fillStyle=this.c;
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.s,0,Math.PI*2);
+        ctx.fill();
+        ctx.globalAlpha=1;
+    }
+}
+
+class Firework{
+    constructor(){
+        this.x=Math.random()*innerWidth;
+        this.y=Math.random()*innerHeight*.6;
+        this.c=`hsl(${Math.random()*360},100%,65%)`;
+        this.p=[];
+        const count = innerWidth < 800 ? 90 : 160;
+        for(let i=0;i<count;i++)
+            this.p.push(new Particle(this.x,this.y,this.c));
+    }
+    update(){
+        this.p.forEach(p=>p.update());
+        this.p=this.p.filter(p=>p.a>0);
+    }
+    draw(){
+        this.p.forEach(p=>p.draw());
+    }
+}
+
+function animate(){
+    ctx.fillStyle="rgba(0,0,0,0.25)";
+    ctx.fillRect(0,0,innerWidth,innerHeight);
+    fireworks.forEach(f=>{f.update();f.draw();});
+    fireworks=fireworks.filter(f=>f.p.length);
+    requestAnimationFrame(animate);
+}
+animate();
+
+/* ===== HIỂN THỊ LỜI CHÚC ===== */
+function showWish(){
+    wishEl.textContent = wishes[wishIndex];
+    wishIndex = (wishIndex + 1) % wishes.length;
+
+    const randomDelay = 3000 + Math.random() * 1000;
+    setTimeout(showWish, randomDelay);
+}
+
+/* ===== KHI QUA GIAO THỪA ===== */
+function newYear(){
+    countdownEl.style.display="none";
+
+    document.body.appendChild(
+        Object.assign(document.createElement("div"),{className:"flash"})
+    );
+
+    setInterval(()=>{
+        fireworks.push(new Firework());
+    }, innerWidth<800?600:350);
+
+    wishEl.style.display="block";
+    showWish();
+}
+
+</script>
+</body>
+</html>
